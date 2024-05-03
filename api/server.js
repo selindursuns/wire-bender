@@ -31,9 +31,11 @@ parser.on('data', function(data) {
 });
 
 // Helper function to add delay
+
 const delay = ms => new Promise(resolve => setTimeout(resolve, ms));
 
 // Function to send data to Arduino
+
 async function sendToArduino(data) {
     if (serialPort.isOpen) {
         await serialPort.write(data + '\n', async (err) => {
@@ -118,18 +120,21 @@ function consolidateCommands(commands, angleTolerance = 10, minLength = 0.5) {
 }
 
 // Endpoint to process drawing and send commands to Arduino
-app.post('/process-drawing', async (req, res) => {
+app.post('/process-drawing', async (req, res, ) => {
     if (!req.body.paths || !Array.isArray(req.body.paths)) {
         return res.status(400).send('Invalid input: paths must be an array');
     }
     try {
         let commands = [];
+        // let numCommands = [];
         for (const path of req.body.paths) {
             const processedCommands = processSVGPath(path);
             commands = commands.concat(processedCommands);
+
         }
         let consolidatedCommands = consolidateCommands(commands);
         const commandString = consolidatedCommands.map(cmd => `L${cmd.length}A${cmd.angle}`).join(' ');
+        const numCommands = consolidatedCommands.map(cmd => `L${cmd.length}A${cmd.angle}`).join(' ');
         console.log('Command string to send:', commandString); // Debug output
 
         await sendToArduino(commandString);
